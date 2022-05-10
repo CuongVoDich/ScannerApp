@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/cuongDt/Documents/ScannerApp/app/src/main/res/layout/activity_main.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/cuongDt/Downloads/Telegram Desktop/CamScanner/app/src/main/res/drawable/circle.xml" value="0.225" />
+        <entry key="..\:/Users/cuongDt/Downloads/Telegram Desktop/CamScanner/app/src/main/res/drawable/ic_lock.xml" value="0.196" />
+        <entry key="..\:/Users/cuongDt/Downloads/Telegram Desktop/CamScanner/app/src/main/res/layout/activity_crop_document.xml" value="0.264" />
+        <entry key="..\:/Users/cuongDt/Downloads/Telegram Desktop/CamScanner/app/src/main/res/layout/activity_main.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/cuongDt/Downloads/Telegram Desktop/CamScanner/app/src/main/res/layout/activity_scanner.xml" value="0.22" />
+        <entry key="..\:/Users/cuongDt/Downloads/Telegram Desktop/CamScanner/app/src/main/res/layout/drawer_list_item.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/cuongDt/Downloads/Telegram Desktop/CamScanner/app/src/main/res/layout/main_layout.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/cuongDt/Downloads/Telegram Desktop/CamScanner/scanlibrary/src/main/res/layout/pick_image_fragment.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/cuongDt/Downloads/Telegram Desktop/CamScanner/scanlibrary/src/main/res/layout/scan_layout.xml" value="0.36666666666666664" />
+      </map>
+    </option>
+  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK" />
+</project>

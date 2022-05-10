@@ -233,6 +233,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         ly_empty = (LinearLayout) findViewById(R.id.ly_empty);
         tv_empty = (TextView) findViewById(R.id.tv_empty);
         iv_group_camera = (ImageView) findViewById(R.id.iv_group_camera);
+        // moi dem anh nhin
     }
 
 
