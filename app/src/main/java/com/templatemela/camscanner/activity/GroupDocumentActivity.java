@@ -370,7 +370,8 @@ public class GroupDocumentActivity extends BaseActivity implements View.OnClickL
                 }
             }
             if (arrayList.size() > 0) {
-                isDocExists = true;
+
+                // create pdf
                 createPDFfromBitmap(group_name, arrayList, "temp");
             } else {
                 runOnUiThread(new Runnable() {
@@ -574,6 +575,7 @@ public class GroupDocumentActivity extends BaseActivity implements View.OnClickL
                 et_confirm_pass.setSelection(et_enter_pass.getText().length());
             }
         });
+
 
         ((TextView) dialog.findViewById(R.id.tv_done)).setOnClickListener(new View.OnClickListener() {
             @Override

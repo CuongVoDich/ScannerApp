@@ -114,7 +114,7 @@ public class CropDocumentActivity extends BaseActivity implements View.OnClickLi
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.activity_crop_document);
-        dbHelper = new DBHelper(this);
+        dbHelper = new DBHelper(this); // why?
         init();
     }
 

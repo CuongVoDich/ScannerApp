@@ -21,8 +21,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:elevation="5dp"
                 android:background="@color/white"
+                android:elevation="5dp"
                 android:orientation="vertical">
 
                 <RelativeLayout
@@ -44,10 +44,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/_5sdp"
                         android:layout_toEndOf="@+id/iv_back_camera"
                         android:fontFamily="@font/inter_medium"
                         android:text="@string/scanner"
-                        android:layout_marginLeft="@dimen/_5sdp"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_16sdp" />
 
@@ -178,6 +178,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1">
+                <ImageView
+                    android:scaleType="centerCrop"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/imgFrameReal"/>
+
 
                 <com.otaliastudios.cameraview.CameraView
                     android:id="@+id/cameraView"
@@ -190,10 +196,39 @@
                     android:keepScreenOn="true"
                     app:cameraAudio="off"
                     app:cameraAutoFocusMarker="@string/cameraview_default_autofocus_marker"
+                    app:cameraEngine="camera2"
                     app:cameraFacing="back"
                     app:cameraFlash="auto"
                     app:cameraGestureTap="autoFocus"
                     app:cameraWhiteBalance="auto" />
+
+                <me.pqpo.smartcropperlib.view.CropImageView
+                    android:visibility="gone"
+                    android:id="@+id/cropper_test"
+                    android:layout_width="120dp"
+                    android:layout_height="160dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_gravity="center"
+                    android:background="#f20"
+
+                    app:civAutoScanEnable="true"
+                    app:civLineColor="@color/light_txt_color"
+                    app:civMagnifierCrossColor="@color/light_txt_color"
+                    app:civPointColor="@color/light_txt_color"
+                    app:civPointFillColor="@color/light_txt_color"
+                    app:civShowEdgeMidPoint="true"
+                    app:civShowGuideLine="true" />
+
+
+                <com.templatemela.camscanner.graphic.GraphicView
+                    android:id="@+id/graphicView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+
+
+
 
                 <RelativeLayout
                     android:id="@+id/rl_book_view"
@@ -343,8 +378,8 @@
         android:id="@+id/ly_crop"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="@color/bg_color1"
+        android:orientation="vertical"
         android:visibility="gone">
 
         <LinearLayout
@@ -372,10 +407,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/_8sdp"
                     android:layout_toEndOf="@+id/iv_back_crop"
                     android:fontFamily="@font/inter_medium"
                     android:text="Crop Document"
-                    android:layout_marginLeft="@dimen/_8sdp"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_15sdp" />
             </RelativeLayout>
@@ -397,9 +432,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|right|center_vertical|center_horizontal|center|end"
-                        android:onClick="onClick"
                         android:layout_marginRight="@dimen/_5sdp"
                         android:layout_marginBottom="@dimen/_5sdp"
+                        android:onClick="onClick"
                         android:src="@drawable/ic_full_screen" />
 
                     <me.pqpo.smartcropperlib.view.CropImageView
@@ -447,16 +482,16 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:tint="@color/bg_color1"
-                                android:src="@drawable/ic_rotate_doc" />
+                                android:src="@drawable/ic_rotate_doc"
+                                android:tint="@color/bg_color1" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
+                                android:layout_marginTop="@dimen/_3sdp"
                                 android:fontFamily="@font/inter_regular"
                                 android:text="Rotate Doc"
-                                android:layout_marginTop="@dimen/_3sdp"
                                 android:textColor="@color/bg_color1"
                                 android:textSize="@dimen/_12sdp" />
                         </LinearLayout>
@@ -480,9 +515,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
+                                android:layout_marginTop="@dimen/_3sdp"
                                 android:fontFamily="@font/inter_regular"
                                 android:text="Current Filter"
-                                android:layout_marginTop="@dimen/_3sdp"
                                 android:textColor="@color/bg_color1"
                                 android:textSize="@dimen/_12sdp" />
                         </LinearLayout>
@@ -498,32 +533,33 @@
                             android:id="@+id/iv_retake"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:onClick="onClick"
-                            android:textSize="@dimen/_13sdp"
-                            android:fontFamily="@font/inter_regular"
-                            android:textColor="@color/black"
-                            android:text="@string/retake"
-                            android:background="@drawable/white_bg"
-                            android:padding="@dimen/_5sdp"
                             android:layout_marginLeft="@dimen/_8sdp"
                             android:layout_marginRight="@dimen/_5sdp"
-                            android:gravity="center" />
+                            android:layout_weight="1"
+                            android:background="@drawable/white_bg"
+                            android:fontFamily="@font/inter_regular"
+                            android:gravity="center"
+                            android:onClick="onClick"
+                            android:padding="@dimen/_5sdp"
+                            android:text="@string/retake"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_13sdp" />
+
                         <TextView
                             android:id="@+id/iv_continue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:onClick="onClick"
-                            android:textSize="@dimen/_13sdp"
-                            android:background="@drawable/white_bg"
-                            android:fontFamily="@font/inter_regular"
-                            android:textColor="@color/black"
-                            android:text="@string/continue1"
-                            android:padding="@dimen/_5sdp"
                             android:layout_marginLeft="@dimen/_5sdp"
                             android:layout_marginRight="@dimen/_8sdp"
-                            android:gravity="center" />
+                            android:layout_weight="1"
+                            android:background="@drawable/white_bg"
+                            android:fontFamily="@font/inter_regular"
+                            android:gravity="center"
+                            android:onClick="onClick"
+                            android:padding="@dimen/_5sdp"
+                            android:text="@string/continue1"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_13sdp" />
 
                     </LinearLayout>
                 </LinearLayout>
@@ -535,8 +571,8 @@
         android:id="@+id/ly_filter"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="@color/bg_color1"
+        android:orientation="vertical"
         android:visibility="gone">
 
         <LinearLayout
@@ -564,9 +600,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/_5sdp"
                     android:layout_toEndOf="@+id/iv_back_filter"
                     android:fontFamily="@font/inter_medium"
-                    android:layout_marginLeft="@dimen/_5sdp"
                     android:text="Current Filter"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_15sdp" />
@@ -611,6 +647,7 @@
                     android:orientation="horizontal"
                     android:paddingTop="@dimen/_15sdp"
                     android:paddingBottom="@dimen/_15sdp">
+
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -741,4 +778,6 @@
         android:layout_height="@dimen/_45sdp"
         android:layout_centerInParent="true"
         android:visibility="gone" />
+
+
 </RelativeLayout>

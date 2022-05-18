@@ -1,5 +1,6 @@
 package com.templatemela.camscanner.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -13,9 +14,19 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.Xfermode;
+import android.graphics.YuvImage;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -32,6 +43,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.WorkerThread;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -47,21 +60,28 @@ import com.otaliastudios.cameraview.CameraListener;
 import com.otaliastudios.cameraview.CameraView;
 import com.otaliastudios.cameraview.PictureResult;
 import com.otaliastudios.cameraview.VideoResult;
+import com.otaliastudios.cameraview.controls.Engine;
 import com.otaliastudios.cameraview.controls.Facing;
 import com.otaliastudios.cameraview.controls.Flash;
+import com.otaliastudios.cameraview.frame.Frame;
+import com.otaliastudios.cameraview.frame.FrameProcessor;
+import com.otaliastudios.cameraview.size.Size;
 import com.scanlibrary.ScanActivity;
 import com.templatemela.camscanner.R;
 import com.templatemela.camscanner.db.DBHelper;
+import com.templatemela.camscanner.graphic.GraphicView;
 import com.templatemela.camscanner.main_utils.BitmapUtils;
 import com.templatemela.camscanner.main_utils.Constant;
 import com.templatemela.camscanner.models.BookModel;
 import com.templatemela.camscanner.models.DBModel;
+import com.templatemela.camscanner.qrcode_generate.Intents;
 import com.templatemela.camscanner.utils.AdsUtils;
 import com.yalantis.ucrop.UCrop;
 import com.yalantis.ucrop.util.FileUtils;
 
 import org.bouncycastle.crypto.tls.CipherSuite;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -70,6 +90,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import io.reactivex.functions.Consumer;
+import io.reactivex.subjects.PublishSubject;
+import me.pqpo.smartcropperlib.SmartCropper;
 import me.pqpo.smartcropperlib.view.CropImageView;
 
 public class ScannerActivity extends BaseActivity implements ActivityCompat.OnRequestPermissionsResultCallback/*, AspectRatioFragment.Listener*/, View.OnClickListener {
@@ -193,11 +216,17 @@ public class ScannerActivity extends BaseActivity implements ActivityCompat.OnRe
     private View v_document;
     private View v_idcard;
     private View v_photo;
+    private GraphicView graphicView;
+    private int frameReal = 0;
+    private PublishSubject<Frame> framePublishSubject;
+    private CropImageView cropper_test;
+    private ImageView imgFrameReal ;
 
     @Override
     public void onResume() {
         super.onResume();
         if (ContextCompat.checkSelfPermission(this, "android.permission.CAMERA") == PackageManager.PERMISSION_GRANTED) {
+            cameraView.setEngine(Engine.CAMERA2);
             cameraView.open();
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, "android.permission.CAMERA")) {
             ConfirmationDialogFragment.newInstance(R.string.camera_permission_confirmation, new String[]{"android.permission.CAMERA"}, 1, R.string.camera_permission_not_granted).show(getSupportFragmentManager(), FRAGMENT_DIALOG);
@@ -221,6 +250,8 @@ public class ScannerActivity extends BaseActivity implements ActivityCompat.OnRe
     @Override
     public void onDestroy() {
         super.onDestroy();
+        framePublishSubject.onComplete();
+        framePublishSubject = null;
 
         if (broadcastReceiver != null) {
             try {
@@ -237,11 +268,75 @@ public class ScannerActivity extends BaseActivity implements ActivityCompat.OnRe
         getWindow().setFlags(1024, 1024);
         setContentView(R.layout.activity_scanner);
         dbHelper = new DBHelper(this);
+        framePublishSubject = PublishSubject.create();
         init();
         bindView();
+        // handle Listener ()
+        handleListener();
 
         AdsUtils.loadGoogleInterstitialAd(this, ScannerActivity.this);
     }
+
+    @SuppressLint("CheckResult")
+    private void handleListener() {
+        // frame processing , real time camera
+        // add by cuongDo
+        cameraView.addFrameProcessor(new FrameProcessor() {
+            @Override
+            @WorkerThread
+            public void process(@NonNull Frame frame) {
+                if (frameReal % 10 == 0) {
+                    long time = frame.getTime();
+                    Size size = frame.getSize();
+                    int format = frame.getFormat();
+                    int userRotation = frame.getRotationToUser();
+                    int viewRotation = frame.getRotationToView();
+                    framePublishSubject.onNext(frame);
+                }
+                frameReal++;
+
+
+            }
+        });
+
+        framePublishSubject.subscribe(frame -> {
+
+            try {
+                // cau hinh cua frame.
+                long time = frame.getTime();
+                Size size = frame.getSize();
+                int format = frame.getFormat();
+                int userRotation = frame.getRotationToUser();
+                int viewRotation = frame.getRotationToView();
+                if (frame.getDataClass() == byte[].class) {
+                    byte[] data = frame.getData();
+                    Size s = frame.getSize();
+                    YuvImage yuv = new YuvImage(data, ImageFormat.NV21, s.getWidth(), s.getHeight(), null);
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    yuv.compressToJpeg(new Rect(0, 0, s.getWidth(), s.getHeight()), 100, stream);
+                    byte[] buf = stream.toByteArray();
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(buf, 0, buf.length, null);
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth(), bitmap.getHeight(), true);
+                    Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+                    cropper_test.setImageToCrop(rotatedBitmap);
+                    Point[] points = SmartCropper.scan(rotatedBitmap);
+                    imgFrameReal.setImageBitmap(rotatedBitmap);
+                    graphicView.drawPoints(points, imgFrameReal);
+
+
+                } else if (frame.getDataClass() == Image.class) {
+                    Image data = frame.getData();
+                    // Process android.media.Image...
+                }
+            } catch (Exception e) {
+            }
+        }, throwable -> {
+
+        });
+    }
+
 
     private void init() {
         ly_camera = (LinearLayout) findViewById(R.id.ly_camera);
@@ -281,6 +376,10 @@ public class ScannerActivity extends BaseActivity implements ActivityCompat.OnRe
         iv_sharp_black = (TextView) findViewById(R.id.iv_sharp_black);
         iv_ocv_black = (TextView) findViewById(R.id.iv_ocv_black);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        //
+        graphicView = findViewById(R.id.graphicView);
+        cropper_test = findViewById(R.id.cropper_test);
+        imgFrameReal = findViewById(R.id.imgFrameReal);
     }
 
     private void bindView() {
@@ -1073,6 +1172,7 @@ public class ScannerActivity extends BaseActivity implements ActivityCompat.OnRe
         }
     }
 
+    //
     public static Bitmap scalePreserveRatio(Bitmap bitmap, int i, int i2) {
         if (i2 <= 0 || i <= 0 || bitmap == null) {
             return bitmap;

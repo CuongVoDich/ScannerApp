@@ -215,6 +215,7 @@ public class BaseActivity extends AppCompatActivity {
             document.addCreator(getResources().getString(R.string.app_name));
             Iterator<Bitmap> it = arrayList.iterator();
             while (it.hasNext()) {
+                // set loại giấy cần lưu
                 document.setPageSize(PageSize.A4);
                 document.newPage();
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
