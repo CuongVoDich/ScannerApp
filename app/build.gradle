@@ -58,6 +58,18 @@ android {
             universalApk false
         }
     }*/
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude("META-INF/*.kotlin_module")
+    }
+
 
 }
 
@@ -147,5 +159,13 @@ dependencies {
     implementation 'com.google.mlkit:language-id:17.0.3' // nhan dang ngon ngu ml
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
 
+    implementation 'com.google.api-client:google-api-client-android:1.22.0'
+    implementation 'com.google.apis:google-api-services-vision:v1-rev451-1.25.0'
+    implementation 'com.google.code.findbugs:jsr305:2.0.1'
+    implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
+//    implementation 'com.google.guava:guava:27.0.1-android'
+//    implementation platform('com.google.cloud:libraries-bom:25.3.0')
+//    implementation 'com.google.cloud:google-cloud-vision'
+//    https://mvnrepository.com/artifact/com.google.apis/google-api-services-vision
 
 }
