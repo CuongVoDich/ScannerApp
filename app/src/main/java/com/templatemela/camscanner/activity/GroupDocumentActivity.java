@@ -1,5 +1,6 @@
 package com.templatemela.camscanner.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -59,6 +60,12 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import io.reactivex.Scheduler;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class GroupDocumentActivity extends BaseActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
     private static final String TAG = "GroupDocumentActivity";
@@ -194,7 +201,8 @@ public class GroupDocumentActivity extends BaseActivity implements View.OnClickL
                 onBackPressed();
                 return;
             case R.id.iv_create_pdf:
-                new createAndOpenPDF(current_group).execute(new String[0]);
+//                new createAndOpenPDF(current_group).execute(new String[0]);
+                createOpenPdf(current_group);
                 return;
             case R.id.ly_doc_camera:
                 Constant.inputType = "GroupItem";
@@ -220,6 +228,41 @@ public class GroupDocumentActivity extends BaseActivity implements View.OnClickL
             default:
                 return;
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private void createOpenPdf(String current_group) {
+
+        ArrayList arrayList = new ArrayList();
+        ArrayList<DBModel> groupDocs = dataBaseHelper.getGroupDocs(current_group.replace(" ", ""));
+        Iterator<DBModel> it = groupDocs.iterator();
+        while (it.hasNext()) {
+            DBModel next = it.next();
+            try {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                arrayList.add(BitmapFactory.decodeStream(new FileInputStream(next.getGroup_doc_img()), (Rect) null, options));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        showLoading("creating...");
+        Single.fromCallable(() -> createPDFfromBitmap(current_group, arrayList, "save"))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(s -> {
+
+                    pdfUri = BaseActivity.getURIFromFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" +
+                            getResources().getString(R.string.app_name) + "/" + current_group + ".pdf", GroupDocumentActivity.this);
+                    selected_group_name = current_group;
+                    Constant.IdentifyActivity = "PDFViewerActivity2";
+                    AdsUtils.showGoogleInterstitialAd(GroupDocumentActivity.this, true);
+
+                    hideLoading();
+                }, throwable -> {
+                    hideLoading();
+                    // show custom dialog
+                });
     }
 
     @Override

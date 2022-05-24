@@ -1,6 +1,7 @@
 package com.templatemela.camscanner.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -39,6 +41,8 @@ import java.util.Iterator;
 
 public class BaseActivity extends AppCompatActivity {
     private static final String TAG = "BaseActivity";
+
+    ProgressDialog progressDialog;
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -175,6 +179,21 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+    public void showLoading(String mess) {
+        if (progressDialog != null && progressDialog.isShowing()) return;
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage((mess != null) ? mess : "please wait...");
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+    }
+
+    public void hideLoading() {
+        if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
+    }
+
     public static void hideKeyboard(Activity activity) {
         try {
             ((InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 2);
@@ -197,7 +216,52 @@ public class BaseActivity extends AppCompatActivity {
         return FileProvider.getUriForFile(activity, activity.getPackageName() + ".provider", new File(str));
     }
 
-    public void createPDFfromBitmap(String str, ArrayList<Bitmap> arrayList, String str2) {
+
+    public String createPDFfromBitmap(String str, ArrayList<Bitmap> arrayList, String str2) {
+        FileOutputStream fileOutputStream;
+        Document document = new Document(PageSize.A4, 50, 50, 50, 50);
+        try {
+            File file;
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                String stringFilePath = Environment.getExternalStorageDirectory().getPath() + "/Download/" + getResources().getString(R.string.app_name);
+                file = new File(stringFilePath);
+            } else
+                file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + getResources().getString(R.string.app_name));
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            File file2 = new File(file, str + ".pdf");
+            if (file2.exists()) {
+                file2.delete();
+            }
+            fileOutputStream = new FileOutputStream(file2);
+            PdfWriter.getInstance(document, fileOutputStream).setPageEvent(new HeaderAndFooterOfPDf());
+            document.open();
+            document.addCreationDate();
+            document.addAuthor(getResources().getString(R.string.app_name));
+            document.addCreator(getResources().getString(R.string.app_name));
+            Iterator<Bitmap> it = arrayList.iterator();
+            while (it.hasNext()) {
+                // set loại giấy cần lưu
+                document.newPage();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                it.next().compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                Image instance = Image.getInstance(byteArrayOutputStream.toByteArray());
+                instance.scaleToFit(PageSize.A4.getWidth() - 40, PageSize.A4.getHeight());
+                instance.setAbsolutePosition((PageSize.A4.getWidth() - instance.getScaledWidth()) / 2.0f, (PageSize.A4.getHeight() - instance.getScaledHeight()) / 2.0f);
+                document.add(instance);
+
+            }
+            document.close();
+            fileOutputStream.close();
+            return "success";
+        } catch (DocumentException | IOException e) {
+            Log.e(TAG, "Make Folder to PDF: " + e.getMessage());
+            return "fail";
+        }
+    }
+
+    public void createPDFFromBitmapRx(String str, ArrayList<Bitmap> arrayList, String str2) {
         Document document = new Document();
         try {
             File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + getResources().getString(R.string.app_name));

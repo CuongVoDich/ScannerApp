@@ -1,5 +1,6 @@
 package com.templatemela.camscanner.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -55,6 +56,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class SavedDocumentPreviewActivity extends BaseActivity implements View.OnClickListener, SavedToolsAdapter.OnSavedToolSelected {
     private static final String TAG = "SavedDocumentPreviewAct";
@@ -283,9 +289,10 @@ public class SavedDocumentPreviewActivity extends BaseActivity implements View.O
                 } catch (IOException e2) {
                     e2.printStackTrace();
                 }
-                ArrayList arrayList = new ArrayList();
+                ArrayList arrayList = new ArrayList<Bitmap>();
                 arrayList.add(Constant.original);
                 new openPDF(arrayList, edit_doc_grp_name).execute(new String[0]);
+//                openPdfView(arrayList, edit_doc_grp_name);
                 return;
             case NAME:
                 updateGroupName(edit_doc_grp_name);
@@ -388,6 +395,34 @@ public class SavedDocumentPreviewActivity extends BaseActivity implements View.O
             default:
                 return;
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private void openPdfView(ArrayList<Bitmap> arrayList, String edit_doc_grp_name) {
+        showLoading(" đang chuyển pdf");
+        Single.fromCallable(() ->
+                createPDFfromBitmap(edit_doc_grp_name, arrayList, "temp")).
+                subscribeOn(Schedulers.io()).
+                observeOn(AndroidSchedulers.mainThread()).
+                subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        pdfUri = BaseActivity.getURIFromFile(Environment.getExternalStoragePublicDirectory(
+                                Environment.DIRECTORY_DOWNLOADS)
+                                + "/" + getResources().getString(R.string.app_name)
+                                + "/" + edit_doc_grp_name
+                                + ".pdf", SavedDocumentPreviewActivity.this);
+                        hideLoading();
+                        selected_group_name = edit_doc_grp_name;
+                        Constant.IdentifyActivity = "PDFViewerActivity_Preview";
+                        AdsUtils.showGoogleInterstitialAd(SavedDocumentPreviewActivity.this, true);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        hideLoading();
+                    }
+                });
     }
 
     public class openPDF extends AsyncTask<String, Void, String> {

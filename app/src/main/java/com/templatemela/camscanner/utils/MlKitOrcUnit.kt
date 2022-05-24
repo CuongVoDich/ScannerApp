@@ -12,7 +12,7 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.io.File
 import java.io.IOException
 
-object OrcUnit {
+object MlKitOrcUnit {
     fun getMapText(uri: File?, callback: (map: HashMap<String?, String?>) -> Unit) {
 
         var mapTexts = hashMapOf<String?, String?>()
