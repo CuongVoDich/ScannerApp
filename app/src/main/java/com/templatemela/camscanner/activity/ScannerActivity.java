@@ -219,7 +219,6 @@ public class ScannerActivity extends BaseActivity implements ActivityCompat.OnRe
     private GraphicView graphicView;
     private int frameReal = 0;
     private PublishSubject<Frame> framePublishSubject;
-    private CropImageView cropper_test;
     private ImageView imgFrameReal ;
 
     @Override
@@ -320,7 +319,6 @@ public class ScannerActivity extends BaseActivity implements ActivityCompat.OnRe
                     matrix.postRotate(90);
                     Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth(), bitmap.getHeight(), true);
                     Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-                    cropper_test.setImageToCrop(rotatedBitmap);
                     Point[] points = SmartCropper.scan(rotatedBitmap);
                     imgFrameReal.setImageBitmap(rotatedBitmap);
                     graphicView.drawPoints(points, imgFrameReal);
@@ -378,7 +376,6 @@ public class ScannerActivity extends BaseActivity implements ActivityCompat.OnRe
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         //
         graphicView = findViewById(R.id.graphicView);
-        cropper_test = findViewById(R.id.cropper_test);
         imgFrameReal = findViewById(R.id.imgFrameReal);
     }
 

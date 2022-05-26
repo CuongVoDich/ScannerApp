@@ -420,6 +420,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         dialog.show();
     }
 
+
     @Override
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onRequestPermissionsResult(int i, String[] strArr, int[] iArr) {
@@ -433,6 +434,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                             AdsUtils.showGoogleInterstitialAd(MainActivity.this, true);
                             return;
                         }
+
                         ActivityCompat.requestPermissions(this, new String[]{"android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.CAMERA"}, 4);
                     }
                 } else if (checkSelfPermission("android.permission.READ_EXTERNAL_STORAGE") == PackageManager.PERMISSION_GRANTED && checkSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE") == PackageManager.PERMISSION_GRANTED && checkSelfPermission("android.permission.CAMERA") == PackageManager.PERMISSION_GRANTED) {

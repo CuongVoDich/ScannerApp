@@ -202,26 +202,9 @@
                     app:cameraGestureTap="autoFocus"
                     app:cameraWhiteBalance="auto" />
 
-                <me.pqpo.smartcropperlib.view.CropImageView
-                    android:visibility="gone"
-                    android:id="@+id/cropper_test"
-                    android:layout_width="120dp"
-                    android:layout_height="160dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_gravity="center"
-                    android:background="#f20"
-
-                    app:civAutoScanEnable="true"
-                    app:civLineColor="@color/light_txt_color"
-                    app:civMagnifierCrossColor="@color/light_txt_color"
-                    app:civPointColor="@color/light_txt_color"
-                    app:civPointFillColor="@color/light_txt_color"
-                    app:civShowEdgeMidPoint="true"
-                    app:civShowGuideLine="true" />
-
 
                 <com.templatemela.camscanner.graphic.GraphicView
+                    android:visibility="gone"
                     android:id="@+id/graphicView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
@@ -235,7 +218,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/book_view"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    >
 
                     <ImageView
                         android:layout_width="match_parent"
@@ -286,7 +270,7 @@
                             android:layout_centerVertical="true"
                             android:padding="@dimen/_6sdp"
                             android:src="@drawable/ic_error_black_24dp"
-                            android:tint="@color/colorAccent" />
+                            app:tint="@color/colorAccent" />
 
                         <TextView
                             android:layout_width="wrap_content"

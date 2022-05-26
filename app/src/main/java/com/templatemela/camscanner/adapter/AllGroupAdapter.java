@@ -24,10 +24,10 @@ public class AllGroupAdapter extends RecyclerView.Adapter<AllGroupAdapter.ViewHo
     public ArrayList<DBModel> arrayList;
     private String current_mode;
 
-    public AllGroupAdapter(Activity activity2, ArrayList<DBModel> arrayList2, String str) {
+    public AllGroupAdapter(Activity activity2, ArrayList<DBModel> arrayList2, String mode) {
         this.activity = activity2;
         this.arrayList = arrayList2;
-        this.current_mode = str;
+        this.current_mode = mode;
     }
 
     public void filterList(ArrayList<DBModel> arrayList2) {
